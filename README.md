@@ -1,29 +1,40 @@
 # AliSnow
 
-A native macOS desktop snow overlay powered by **Metal** and **SwiftUI**. Snowfall physics and rendering run entirely on the GPU, react smoothly to cursor movement, and are controlled from the Menu Bar.
+A native macOS atmospheric weather overlay powered by **Metal** and **SwiftUI** — designed with an Alcove-inspired dark glass Menu Bar HUD, 7 GPU-accelerated weather vibes, interactive cursor physics, and live snow/petal accumulation on screen edges, windows, and Finder desktop folders.
+
+## Weather Modes
+
+| Mode | Visual Vibe & Physics |
+| :--- | :--- |
+| **Snow** | Soft glowing snowflakes with 6-point crystal glint, depth parallax, and sculpted snowdrifts. |
+| **Blizzard** | Gusting horizontal wind waves, dense fast-moving snow, and rapid drift buildup. |
+| **Rain** | Velocity-stretched rain streaks, invisible **cursor umbrella shield**, and splash bursts on surfaces. |
+| **Storm** | Heavy downpour with wind gusts, intense splashes, and subtle atmospheric lightning flashes. |
+| **Sakura** | Tumbling cherry blossom petals with 3D flutter oscillation and soft pink fallen petal carpets. |
+| **Autumn** | Warm gold, amber, and crimson falling leaves gliding gently onto ledges and the bottom edge. |
+| **Fireflies** | Dreamy night glow with pulsing warm-gold and mint bokeh orbs swirling around your cursor. |
 
 ## Features
 
-- **GPU-Accelerated Metal Simulation** — up to 2,500 snowflakes with depth parallax, gentle horizontal sway, configurable wind, and soft glowing particles.
-- **Cursor Interaction** — moving the cursor repels nearby snowflakes and creates a directional wind wake across all apps (no extra permissions required).
-- **Transparent Click-Through Overlay** — borderless full-screen overlay that ignores mouse events and spans all displays and Spaces.
-- **Menu Bar Controls** — lightweight Menu Bar accessory (`LSUIElement`, no Dock icon) with a snowflake icon to toggle snowfall, cursor interaction, intensity, and wind strength.
-- **App Sandbox Disabled** — preconfigured without App Sandbox to support upcoming desktop Finder folder collision & snow accumulation.
+- **Alcove-Style Menu Bar HUD** — dark translucent glass popover with dynamic mode-tinted glow, tactile weather cards, intensity & wind sliders, quick toggles, and instant drift sweep.
+- **Surface Accumulation & Collisions** — snowdrifts, fallen petals/leaves, and rain splashes collect along the bottom edge of the screen, on top of open application windows (zero permissions needed), and on **Finder desktop folders** (via Accessibility permission). Sweep your cursor across drifts or folder caps to brush them away!
+- **Native Settings Window** — configure Launch at Login, overlay layer (above all windows vs. desktop-only), surface collision sources, Accessibility status, and frame rate (30 / 60 / 120 FPS).
+- **Zero-Idle Efficiency** — Metal compute + instanced quad rendering (< 0.5 ms GPU/frame), real `MTKView` suspension when paused (**0% CPU/GPU**), and automatic 30 FPS throttling in macOS Low Power Mode.
+- **App Sandbox Disabled** — ready for direct macOS distribution and Finder desktop integration.
 
 ## Requirements
 
 - macOS 14.0+
 - Xcode 16+ (tested on Xcode 27.2 / Apple Silicon)
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen) *(optional, if regenerating `.xcodeproj` from `project.yml`)*
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen) *(optional, for regenerating `.xcodeproj` from `project.yml`)*
 
 ## Getting Started
 
 ### Using Xcode
-1. Open the project:
-   ```bash
-   open AliSnow.xcodeproj
-   ```
-2. Press **Cmd + R** — snow will start falling over your screen and a snowflake icon will appear in the Menu Bar.
+```bash
+open AliSnow.xcodeproj
+```
+Press **Cmd + R** — your desktop atmosphere starts immediately and the live weather icon appears in the Menu Bar.
 
 ### Using Terminal (`xcodebuild`)
 ```bash
@@ -31,29 +42,20 @@ xcodebuild -project AliSnow.xcodeproj -scheme AliSnow -configuration Debug -deri
 open build/DerivedData/Build/Products/Debug/AliSnow.app
 ```
 
-> **Note:** `SnowShaders.metal` is bundled as an app resource and compiled via macOS's built-in runtime Metal compiler at launch (automatically preferring `default.metallib` if `MetalToolchain` is installed). This allows immediate builds and runs without downloading extra Xcode components.
+> **Note:** `SnowShaders.metal` is bundled as a resource and compiled via macOS's built-in runtime Metal compiler at launch (preferring `default.metallib` if `MetalToolchain` is installed), so the project builds cleanly without extra Xcode downloads.
 
 ## Project Structure
 
 ```text
 AliSnow/
-├── AliSnowApp.swift        # Entry point, MenuBarExtra UI, and transparent NSWindow overlays
-├── SnowRenderer.swift      # MTKViewDelegate, Metal pipelines, and global cursor tracking
-├── SnowShaders.metal       # GPU compute shader (updateSnow) + vertex/fragment shaders
-└── Assets.xcassets         # App icon and accent color assets
-AliSnow.xcodeproj/          # macOS SwiftUI Xcode project (App Sandbox disabled)
-project.yml                 # XcodeGen specification
+├── AliSnowApp.swift             # App entry point, MenuBarExtra, Settings window, overlay manager
+├── WeatherPreset.swift          # 7 weather modes, palettes, defaults, persistent AppSettings
+├── MenuBarHUDView.swift         # Alcove-inspired dark glass Menu Bar HUD
+├── SettingsView.swift           # Native macOS Settings window (General, Surfaces, Performance)
+├── DesktopObstacleTracker.swift # Background scanner for Finder desktop folders & window tops
+├── SnowRenderer.swift           # Metal compute/render pipelines, accumulation & real pause
+├── SnowShaders.metal            # 7-mode GPU physics, instanced quads, snowdrifts & lightning
+└── Assets.xcassets              # App icon and accent color assets
+AliSnow.xcodeproj/               # macOS SwiftUI Xcode project (App Sandbox disabled)
+project.yml                      # XcodeGen specification
 ```
-
-## Performance
-
-- **Particle Buffer:** `2,500 × 32 bytes ≈ 78 KB` plus `48 bytes` of per-frame uniforms.
-- **GPU Work:** `1 compute dispatch` + `1 draw call` (`.point` primitives), taking **< 0.3 ms/frame** on Apple Silicon.
-- **CPU Usage:** ~1–3% at 60 FPS (all simulation and rendering runs on the GPU).
-- **Memory Footprint:** ~50–90 MB total (primarily the full-screen transparent `MTKView` drawable buffers).
-
-## Roadmap
-
-- [x] **Stage 1:** Base macOS Xcode project without Sandbox, Metal snowfall with cursor interaction, Menu Bar controls.
-- [ ] **Stage 2:** Snowdrifts and snow accumulation on Finder desktop folders and icons.
-- [ ] **Stage 3:** Power optimizations (pause `MTKView` at 0% idle usage, 30/60 FPS selector, Low Power Mode throttling).
