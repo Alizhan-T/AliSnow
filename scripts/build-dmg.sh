@@ -16,6 +16,7 @@ xcodebuild \
   -scheme "$APP_NAME" \
   -configuration Release \
   -derivedDataPath "$BUILD_DIR" \
+  MARKETING_VERSION="$VERSION" \
   build
 
 if [ ! -d "$APP_PATH" ]; then

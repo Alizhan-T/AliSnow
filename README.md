@@ -22,6 +22,12 @@ A native macOS atmospheric weather overlay powered by **Metal** and **SwiftUI** 
 - **Zero-Idle Efficiency** — Metal compute + instanced quad rendering (< 0.5 ms GPU/frame), real `MTKView` suspension when paused (**0% CPU/GPU**), and automatic 30 FPS throttling in macOS Low Power Mode.
 - **App Sandbox Disabled** — ready for direct macOS distribution and Finder desktop integration.
 
+## Download
+
+Grab the latest Universal macOS `.dmg` (Apple Silicon & Intel) from [GitHub Releases](https://github.com/Alizhan-T/AliSnow/releases/latest), drag **AliSnow** into **Applications**, and launch it.
+
+> **First launch note:** Since releases are ad-hoc signed without an Apple Developer ID, on first launch macOS may prompt Gatekeeper — open **System Settings → Privacy & Security → Open Anyway** once.
+
 ## Requirements
 
 - macOS 14.0+
