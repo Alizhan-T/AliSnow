@@ -42,6 +42,15 @@ xcodebuild -project AliSnow.xcodeproj -scheme AliSnow -configuration Debug -deri
 open build/DerivedData/Build/Products/Debug/AliSnow.app
 ```
 
+### Build Release `.dmg` Installer & Install to `/Applications`
+```bash
+./scripts/build-dmg.sh 1.0.0
+```
+This produces a Universal (`arm64` + `x86_64`) Release build and packages `dist/AliSnow-1.0.0.dmg` with an `Applications` drag-and-drop shortcut. To install directly on your Mac:
+```bash
+rm -rf /Applications/AliSnow.app && cp -R build/ReleaseBuild/Build/Products/Release/AliSnow.app /Applications/AliSnow.app
+```
+
 > **Note:** `SnowShaders.metal` is bundled as a resource and compiled via macOS's built-in runtime Metal compiler at launch (preferring `default.metallib` if `MetalToolchain` is installed), so the project builds cleanly without extra Xcode downloads.
 
 ## Project Structure
